@@ -16,6 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+ var appState = {
+     takingPicture: true,
+     imageUri: ""
+ };
+
+ var APP_STORAGE_KEY = "exampleAppState";
 var app = {
     // Application Constructor
     initialize: function() {
@@ -45,7 +51,36 @@ var app = {
         receivedElement.setAttribute('style', 'display:block;');
 
         console.log('Received Event: ' + id);
+
+//        var tackPic = document.getElementById('take-picture-button');
+        document.getElementById("take-picture-button").addEventListener("click", function() {
+            // Because the camera plugin method launches an external Activity,
+            // there is a chance that our application will be killed before the
+            // success or failure callbacks are called. See onPause() and
+            // onResume() where we save and restore our state to handle this case
+            appState.takingPicture = true;
+
+            navigator.camera.getPicture(cameraSuccessCallback, cameraFailureCallback,
+                {
+                    sourceType: Camera.PictureSourceType.CAMERA,
+                    destinationType: Camera.DestinationType.FILE_URI,
+                    targetWidth: 250,
+                    targetHeight: 250
+                }
+            );
+        });
+
     }
 };
+// Here are the callbacks we pass to getPicture()
+function cameraSuccessCallback(imageUri) {
+    appState.takingPicture = false;
+    appState.imageUri = imageUri;
+    document.getElementById("get-picture-result").src = imageUri;
+}
 
+function cameraFailureCallback(error) {
+    appState.takingPicture = false;
+    console.log(error);
+}
 app.initialize();

@@ -19,19 +19,47 @@
 
 package com.xwang.myapp;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+import android.webkit.JsPromptResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
-import org.apache.cordova.*;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
-public class MainActivity extends CordovaActivity
+public class MainActivity extends Activity
 {
+    @Bind(R.id.webView)
+    WebView webView;
+
+    private JsCallJava jsCallJava;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
-        Log.d("MainActivity", "launchUrl:"+launchUrl);
-        loadUrl(launchUrl);
+//        Log.d("MainActivity", "launchUrl:"+launchUrl);
+//        loadUrl(launchUrl);
+        setContentView(R.layout.layout_main);
+
+        ButterKnife.bind(this);
+
+
+        jsCallJava = new JsCallJava();
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+//                return super.onJsPrompt(view, url, message, defaultValue, result);
+                result.confirm(jsCallJava.call(view, message));
+                return true;
+            }
+        });
+        webView.loadUrl("file:///android_asset/m/index.html");
     }
 }

@@ -39,6 +39,7 @@ var require,
 
 
     function build(module) {
+            console.log("build module:"+module.id);
         var factory = module.factory,
             localRequire = function (id) {
                 var resultantId = id;
